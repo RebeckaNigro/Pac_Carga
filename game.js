@@ -97,6 +97,19 @@ addEventListener('keyup', e => {
     keys[e.key.toLowerCase()] = false;
 });
 
+document.querySelectorAll('[data-key]').forEach(button => {
+    const key = button.dataset.key;
+    button.addEventListener('pointerdown', e => {
+        e.preventDefault();
+        button.setPointerCapture(e.pointerId);
+        keys[key] = true;
+    });
+    button.addEventListener('pointerup', () => keys[key] = false);
+    button.addEventListener('pointercancel', () => keys[key] = false);
+    button.addEventListener('lostpointercapture', () => keys[key] = false);
+});
+addEventListener('blur', () => { for (const key in keys) keys[key] = false; });
+
 document.querySelector('#restart').onclick = start;
 
 // Iniciar jogo

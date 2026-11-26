@@ -78,6 +78,13 @@ canvas {
     font-size: .85rem;
 }
 
+.touch-controls { display: grid; grid-template-columns: repeat(3, 58px); justify-content: center; gap: 6px; margin: 8px auto 14px; }
+.touch-controls button { margin: 0; min-height: 54px; font-size: 22px; touch-action: none; user-select: none; }
+.touch-controls button:first-child { grid-column: 2; }
+.touch-controls button:nth-child(2) { grid-column: 1; }
+.touch-controls button:focus-visible { outline: 3px solid white; outline-offset: 2px; }
+@media (hover: hover) and (pointer: fine) { .touch-controls { display: none; } }
+
 i {
     display: inline-grid;
     place-items: center;
