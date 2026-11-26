@@ -84,6 +84,27 @@ const questions = {
 
 // Controles do teclado
 const keys = {};
+let touchDirection = '';
+let touchStart = null;
+
+canvas.addEventListener('touchstart', e => {
+    const touch = e.changedTouches[0];
+    touchStart = { x: touch.clientX, y: touch.clientY };
+    e.preventDefault();
+}, { passive: false });
+canvas.addEventListener('touchend', e => {
+    if (!touchStart) return;
+    const touch = e.changedTouches[0];
+    const dx = touch.clientX - touchStart.x, dy = touch.clientY - touchStart.y;
+    if (Math.hypot(dx, dy) >= 15) {
+        touchDirection = Math.abs(dx) > Math.abs(dy)
+            ? (dx > 0 ? 'arrowright' : 'arrowleft')
+            : (dy > 0 ? 'arrowdown' : 'arrowup');
+    }
+    touchStart = null;
+    e.preventDefault();
+}, { passive: false });
+canvas.addEventListener('touchcancel', () => { touchStart = null; });
 
 addEventListener('keydown', e => {
     keys[e.key.toLowerCase()] = true;
@@ -97,23 +118,13 @@ addEventListener('keyup', e => {
     keys[e.key.toLowerCase()] = false;
 });
 
-document.querySelectorAll('[data-key]').forEach(button => {
-    const key = button.dataset.key;
-    button.addEventListener('pointerdown', e => {
-        e.preventDefault();
-        button.setPointerCapture(e.pointerId);
-        keys[key] = true;
-    });
-    button.addEventListener('pointerup', () => keys[key] = false);
-    button.addEventListener('pointercancel', () => keys[key] = false);
-    button.addEventListener('lostpointercapture', () => keys[key] = false);
-});
 addEventListener('blur', () => { for (const key in keys) keys[key] = false; });
 
 document.querySelector('#restart').onclick = start;
 
 // Iniciar jogo
 function start() {
+    touchDirection = '';
     map = originalMap.map(row => row.split(''));
 
     player = {
@@ -215,7 +226,7 @@ function update(dt) {
     );
 
     for (const [key, x, y] of controls) {
-        if (keys[key] && move(player, x, y, playerSpeed * dt)) {
+        if ((keys[key] || key === touchDirection) && move(player, x, y, playerSpeed * dt)) {
             player.dir = { x, y };
             break;
         }
